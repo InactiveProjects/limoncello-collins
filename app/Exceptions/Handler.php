@@ -6,7 +6,7 @@ use \Illuminate\Http\Request;
 use \Illuminate\Http\Response;
 use \Neomerx\JsonApi\Document\Error;
 use \Neomerx\JsonApi\Factories\Factory;
-use \App\Http\JsonApi\LaravelIntegration;
+use \App\Http\Controllers\JsonApi\LaravelIntegration;
 use \Neomerx\Limoncello\Config\Config as C;
 use \Neomerx\JsonApi\Encoder\EncoderOptions;
 use \Neomerx\Limoncello\Errors\RenderContainer;
