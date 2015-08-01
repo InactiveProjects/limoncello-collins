@@ -2,7 +2,7 @@
 
 use \Illuminate\Http\Response;
 use \App\Http\Controllers\Controller;
-use \App\Http\JsonApi\LaravelIntegration;
+use \App\Http\JsonApi\Controllers\LaravelIntegration;
 use \Neomerx\Limoncello\Http\JsonApiTrait;
 use \Neomerx\Limoncello\Config\Config as C;
 use \Illuminate\Database\Eloquent\Collection;
