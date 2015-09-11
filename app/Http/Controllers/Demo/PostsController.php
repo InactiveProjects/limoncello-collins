@@ -9,6 +9,17 @@ use \Illuminate\Contracts\Validation\ValidationException;
 
 class PostsController extends JsonApiController
 {
+    private function getTime(\Closure $closure, &$time)
+    {
+        $time_start = microtime(true);
+        try {
+            return $closure();
+        } finally {
+            $time_end   = microtime(true);
+            $time = $time_end - $time_start;
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +29,35 @@ class PostsController extends JsonApiController
     {
         $this->checkParametersEmpty();
 
-        return $this->getResponse(Post::all());
+        $requests = 0;
+        $sqlQueries = [];
+        \DB::listen(function($sql, $bindings, $time) use (&$requests, &$sqlQueries) {
+            $requests++;
+
+            if (isset($sqlQueries[$sql]) === true) {
+                $sqlQueries[$sql] = $sqlQueries[$sql] + 1;
+            } else {
+                $sqlQueries[$sql] = 1;
+            }
+        });
+
+        $builder = Post::with(['author', 'comments', 'author.posts.author', 'comments.post.comments']);
+
+        $time = 0;
+        $posts = $this->getTime(function () use ($builder) {
+            return $builder->get()->all();
+        }, $time);
+
+        \Log::debug('DB query time: ' . $time . ' requests: ' . $requests);
+
+        $response = $this->getTime(function () use ($posts) {
+            return $this->getResponse($posts);
+        }, $time);
+
+        \Log::debug('Encoder time: ' . $time . ' requests: ' . $requests);
+        \Log::debug('Queries: ' . json_encode($sqlQueries));
+
+        return $response;
     }
 
     /**

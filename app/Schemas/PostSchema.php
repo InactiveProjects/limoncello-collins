@@ -47,4 +47,11 @@ class PostSchema extends SchemaProvider
             'comments' => [self::DATA => $post->comments->all()],
         ];
     }
+
+    public function getIncludePaths()
+    {
+        return [
+            'author',
+        ];
+    }
 }
