@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\JsonApi;
 
+use \Generator;
 use \Illuminate\Http\Response;
 use \App\Http\Controllers\Controller;
 use \Neomerx\Limoncello\Http\JsonApiTrait;
@@ -41,7 +42,7 @@ abstract class JsonApiController extends Controller
         $links = null,
         $meta = null
     ) {
-        $data = ($data instanceof Collection ? $data->all() : $data);
+        $data = ($data instanceof Collection ? $this->iterateCollection($data) : $data);
         return $this->getContentResponse($data, $statusCode, $links, $meta);
     }
 
@@ -54,5 +55,17 @@ abstract class JsonApiController extends Controller
         $config[C::JSON][C::JSON_URL_PREFIX] = \Request::getSchemeAndHttpHost();
 
         return $config;
+   }
+   
+   /**
+    * @param Collection $data
+    * 
+    * @return Generator
+    */
+   private function iterateCollection(Collection $data)
+   {
+       foreach ($data->all() as $item) {
+           yield $item;
+       }
    }
 }
